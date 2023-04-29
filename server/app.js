@@ -1,12 +1,14 @@
 const express = require('express')
 const path = require('path')
-const { Product } = require('./db');
+const { Product, User } = require('./db');
+const jwt = require('jsonwebtoken');
 
 const app = express()
 
 // static middleware
 app.use('/dist', express.static(path.join(__dirname, '../dist')))
 
+app.use(express.json());
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'))
@@ -20,6 +22,14 @@ app.get('/api/products', async(req, res, next)=> {
     next(ex);
   }
 });
+
+app.use('/api/auth', require('./routes/auth'));
+
+app.use((err, req, res ,next)=>{
+  console.log(err);
+  res.status(err.status || 500).send({error: err});
+})
+
 
 module.exports = app;
 
